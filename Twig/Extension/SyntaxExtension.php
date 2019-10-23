@@ -9,6 +9,8 @@
  */
 namespace Propel\Bundle\PropelBundle\Twig\Extension;
 
+use Twig\TwigFilter;
+
 /**
  * SyntaxExtension class
  *
@@ -21,7 +23,7 @@ class SyntaxExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            new \Twig_SimpleFilter('format_sql', array($this, 'formatSQL'), array('is_safe' => array('html'))),
+            new TwigFilter('format_sql', array($this, 'formatSQL'), array('is_safe' => array('html'))),
         );
     }
 

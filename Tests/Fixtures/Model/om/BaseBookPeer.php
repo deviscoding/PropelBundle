@@ -699,7 +699,7 @@ abstract class BaseBookPeer
             }
 
             foreach ($cols as $colName) {
-                if ($tableMap->containsColumn($colName)) {
+                if ($tableMap->hasColumn($colName)) {
                     $get = 'get' . $tableMap->getColumn($colName)->getPhpName();
                     $columns[$colName] = $obj->$get();
                 }

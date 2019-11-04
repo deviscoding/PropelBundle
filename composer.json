@@ -4,10 +4,18 @@
   "keywords": ["propel", "orm", "persistence","symfony","3.x","1.x"],
   "type": "symfony-bundle",
   "license": "MIT",
-  "authors": [{
-    "name": "William Durand",
-    "email": "william.durand1@gmail.com"
-  }],
+  "authors": [
+    {
+      "name": "William Durand",
+      "email": "william.durand1@gmail.com",
+      "role": "Developer (original bundle)"
+    },
+    {
+      "name": "AMJones",
+      "email": "am@jonesiscoding.com",
+      "role": "Developer (forked changes only)"
+    }
+  ],
   "autoload": {
     "psr-4": { "Propel\\Bundle\\PropelBundle\\": "" },
     "files": ["autoload_aliases.php"],

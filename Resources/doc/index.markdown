@@ -1,7 +1,8 @@
 PropelBundle
 ============
 
-This is the official implementation of [Propel](http://www.propelorm.org/) in Symfony2.
+This an unofficial implementation of [Propel 1.6](http://www.propelorm.org/) in Symfony, which has been modified to work
+with PHP 7.2, PHP 7.3, and Symfony 3.x.
 
 
 ## Installation ##
@@ -12,36 +13,10 @@ The recommended way to install this bundle is to rely on [Composer](http://getco
 {
     "require": {
         // ...
-        "propel/propel-bundle": "1.1.*"
+        "deviscoding/propel1-bundle": "^1.7"
     }
 }
 ```
-
-Otherwise you can use Git, SVN, Git submodules, or the Symfony vendor management (deps file):
-
- * Clone this bundle in the `vendor/bundles/Propel` directory:
-
-    > git submodule add https://github.com/propelorm/PropelBundle.git vendor/bundles/Propel/PropelBundle
-
- * Checkout Propel and Phing in the `vendor` directory:
-
-    > svn checkout http://svn.github.com/propelorm/Propel.git vendor/propel
-
-    > svn checkout http://svn.phing.info/tags/2.4.6/ vendor/phing
-
- * Instead of using svn, you can clone the unofficial Git repositories:
-
-    > git submodule add https://github.com/phingofficial/phing.git vendor/phing
-
-    > git submodule add https://github.com/propelorm/Propel.git vendor/propel
-
- * Instead of doing this manually, you can use the Symfony vendor management via the deps file:
-
-   See http://www.propelorm.org/cookbook/symfony2/working-with-symfony2.html#via_symfony2_vendor_management
-
-   If you are using a Symfony2 2.x.x version (actually, a version which is not 2.1 or above), be sure to deps.lock the PropelBundle to a commit on the 2.0 branch,
-   which does not use the Bridge
-
 
 The second step is to register this bundle in the `AppKernel` class:
 
@@ -55,19 +30,6 @@ public function registerBundles()
 
     // ...
 }
-```
-
-Don't forget to register the PropelBundle namespace in `app/autoload.php` if you are not using Composer:
-
-``` php
-$loader->registerNamespaces(array(
-    // ...
-    'Propel' => __DIR__.'/../vendor/bundles',
-));
-$loader->registerPrefixes(array(
-    // ...
-    'Phing'  => __DIR__.'/../vendor/phing/classes/phing',
-));
 ```
 
 You are almost ready, the next steps are:

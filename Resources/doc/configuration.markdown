@@ -8,7 +8,7 @@ If you are **not** using Composer, add this configuration:
 ``` yaml
 # in app/config/config.yml
 propel:
-    path:       "%kernel.root_dir%/../vendor/propel"
+    path:       "%kernel.root_dir%/../vendor/palepurple"
     phing_path: "%kernel.root_dir%/../vendor/phing"
 ```
 

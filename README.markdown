@@ -8,7 +8,7 @@ with PHP 7.2+ and Symfony 3.0+.
 
 ### Propel1 integration
 
-The two major branches being supported are:
+The one major branch being supported is:
 
 * The `1.7` branch contains Propel *1.6* integration for Symfony *3.x* and PHP *7.2+*.
 

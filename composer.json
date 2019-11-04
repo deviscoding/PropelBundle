@@ -30,7 +30,7 @@
   },
   "replace": {
     "symfony/propel1-bridge": "<=2.8.0",
-    "propel/PropelBundle": "^1.6"
+    "propel/propel-bundle": "^1.6"
   },
   "suggest": {
     "propel/propel-acl-bundle": "For using the Propel ACL implementation"

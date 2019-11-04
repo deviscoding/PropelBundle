@@ -21,7 +21,7 @@
     "files": ["autoload_aliases.php"],
     "exclude-from-classmap": [ "Tests/" ]
   },
-  "version": "1.7",
+  "version": "1.7.1",
   "require": {
     "symfony/framework-bundle": "^3.0.2",
     "palepurple/propel1": "^1.7"

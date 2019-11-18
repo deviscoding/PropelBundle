@@ -23,6 +23,8 @@
   },
   "version": "1.7.1",
   "require": {
+    "ext-simplexml": "*",
+    "ext-pdo": "*",
     "symfony/framework-bundle": "^3.0.2",
     "palepurple/propel1": "^1.7"
   },

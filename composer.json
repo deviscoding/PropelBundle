@@ -21,7 +21,7 @@
     "files": ["autoload_aliases.php"],
     "exclude-from-classmap": [ "Tests/","vendor/propel/propel1/runtime/lib","vendor/propel/propel1/generator/lib" ]
   },
-  "version": "1.7.1",
+  "version": "1.7.2",
   "require": {
     "ext-simplexml": "*",
     "ext-pdo": "*",

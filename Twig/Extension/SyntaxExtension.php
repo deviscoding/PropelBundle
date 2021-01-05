@@ -9,6 +9,7 @@
  */
 namespace Propel\Bundle\PropelBundle\Twig\Extension;
 
+use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
@@ -18,7 +19,7 @@ use Twig\TwigFilter;
  * @subpackage Extension
  * @author William DURAND <william.durand1@gmail.com>
  */
-class SyntaxExtension extends \Twig_Extension
+class SyntaxExtension extends AbstractExtension
 {
     public function getFilters()
     {

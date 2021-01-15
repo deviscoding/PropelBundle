@@ -70,6 +70,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->children()
                 ->scalarNode('path')->end()
+                ->scalarNode('schema_path')->end()
                 ->scalarNode('phing_path')->end()
                 ->scalarNode('logging')->defaultValue($this->debug)->end()
                 ->arrayNode('build_properties')

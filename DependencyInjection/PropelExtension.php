@@ -62,6 +62,11 @@ class PropelExtension extends Extension
 
         $container->setParameter('propel.logging', $logging);
 
+        if (!empty($config['schema_path']))
+        {
+          $container->setParameter('propel.schema.path', $config['schema_path']);
+        }
+
         // Load services
         if (!$container->hasDefinition('propel')) {
             $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

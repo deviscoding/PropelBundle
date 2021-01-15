@@ -16,6 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -64,6 +65,24 @@ abstract class AbstractCommand extends ContainerAwareCommand
      * @var InputInterface
      */
     protected $input;
+
+    /**
+     * @param string $namespace
+     *
+     * @return string
+     */
+    protected function getPackageFromApp($namespace)
+    {
+      if ('\\' === $namespace[0]) {
+        $namespace = substr($namespace, 1);
+      }
+
+      if (0 === stripos($namespace, 'App\\')) {
+        $namespace = substr($namespace, 4);
+      }
+
+      return 'src.'.str_replace('\\', '.', $namespace);
+    }
 
     /**
      * Return the package for a given bundle.
@@ -235,9 +254,14 @@ abstract class AbstractCommand extends ContainerAwareCommand
         foreach ($finalSchemas as $schema) {
             list($bundle, $finalSchema) = $schema;
 
-            $tempSchema = $bundle->getName().'-'.$finalSchema->getBaseName();
+            if ($bundle) {
+              $tempSchema = $bundle->getName().'-'.$finalSchema->getBaseName();
+            } else {
+              $tempSchema = 'app-' . $finalSchema->getBaseName();
+            }
+
             $this->tempSchemas[$tempSchema] = array(
-                'bundle'    => $bundle->getName(),
+                'bundle'    => ($bundle) ? $bundle->getName() : 'app',
                 'basename'  => $finalSchema->getBaseName(),
                 'path'      => $finalSchema->getPathname(),
             );
@@ -255,15 +279,17 @@ abstract class AbstractCommand extends ContainerAwareCommand
                 // This is used to override the package resulting from namespace conversion.
                 $package = $database['package'];
             } elseif (isset($database['namespace'])) {
-                $package = $this->getPackage($bundle, $database['namespace'], $base);
+                if ($bundle) {
+                  $database['package'] = $this->getPackage($bundle, (string)$database['namespace'], $base);
+                } else {
+                  $database['package'] = $this->getPackageFromApp((string)$database['namespace']);
+                }
             } else {
                 throw new \RuntimeException(
                     sprintf('%s : Please define a `package` attribute or a `namespace` attribute for schema `%s`',
                         $bundle->getName(), $finalSchema->getBaseName())
                 );
             }
-
-            $database['package'] = $package;
 
             if ($this->input && $this->input->hasOption('connection') && $this->input->getOption('connection')
                 && $database['name'] != $this->input->getOption('connection')) {
@@ -277,7 +303,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
                 if (isset($table['package'])) {
                     $table['package'] = $table['package'];
                 } else {
-                    $table['package'] = $package;
+                    $table['package'] = $database['package'];
                 }
             }
 
@@ -303,8 +329,25 @@ abstract class AbstractCommand extends ContainerAwareCommand
             $finalSchemas = array_merge($finalSchemas, $this->getSchemasFromBundle($bundle));
         }
 
+        $finalSchemas = array_merge($finalSchemas, $this->getSchemasFromConfiguration());
+
         return $finalSchemas;
     }
+
+  protected function getSchemasFromConfiguration()
+  {
+    $schemas = [];
+    if (is_dir($dir = $this->getContainer()->getParameter('propel.schema.path')))
+    {
+      $path = $dir . DIRECTORY_SEPARATOR . 'schema.xml';
+      if (is_file($path)) {
+        $schema = new \SplFileInfo($path);
+        $schemas[(string) $schema] = array(null, $schema);
+      }
+    }
+
+    return $schemas;
+  }
 
     /**
      * @param \Symfony\Component\HttpKernel\Bundle\BundleInterface $bundle
@@ -460,6 +503,11 @@ EOT;
     protected function getCacheDir()
     {
         return $this->cacheDir;
+    }
+
+    protected function getProjectDir()
+    {
+      return $this->getContainer()->getParameter('kernel.project_dir');
     }
 
     /**
@@ -647,12 +695,22 @@ EOT;
     {
         $args = array();
 
+        $projectDir = $this->getProjectDir();
+        if ($kernel instanceof Kernel)
+        {
+          $output = ($kernel::MAJOR_VERSION > 3) ? $projectDir.'/var/propel' : $projectDir.'/app/propel';
+        }
+        else
+        {
+          $output = is_dir($projectDir.'/var') ? $projectDir.'/var/propel' : $projectDir.'/app/propel';
+        }
+
         // Default properties
         $properties = array_merge(array(
             'propel.database'           => 'mysql',
             'project.dir'               => $workingDirectory,
-            'propel.output.dir'         => $kernel->getProjectDir().'/propel',
-            'propel.php.dir'            => $kernel->getProjectDir(),
+            'propel.output.dir'         => $output,
+            'propel.php.dir'            => $projectDir,
             'propel.packageObjectModel' => true,
             'propel.useDateTimeClass'   => true,
             'propel.dateTimeClass'      => 'DateTime',

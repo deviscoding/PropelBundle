@@ -60,7 +60,7 @@ abstract class AbstractDataLoader extends AbstractDataHandler implements DataLoa
             foreach ($files as $file) {
                 $content = $this->transformDataToArray($file);
 
-                if (count($content) > 0) {
+                if (is_countable($content) && count($content) > 0) {
                     $datas = array_merge_recursive($datas, $content);
                     $nbFiles++;
                 }

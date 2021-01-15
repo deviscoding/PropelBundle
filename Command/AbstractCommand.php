@@ -221,6 +221,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
             // Guess errors
             if (strstr($this->buffer, 'failed. Aborting.') ||
                 strstr($this->buffer, 'Failed to execute') ||
+                strstr($this->buffer, 'Unknown behavior') ||
                 strstr($this->buffer, 'failed for the following reason:')) {
                 $returnStatus = false;
             }

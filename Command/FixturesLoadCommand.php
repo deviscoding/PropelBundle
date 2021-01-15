@@ -148,6 +148,8 @@ EOT
                 $output->writeln('No <info>YML</info> fixtures found.');
             }
         }
+
+        return 0;
     }
 
     /**

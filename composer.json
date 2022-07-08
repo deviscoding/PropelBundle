@@ -21,13 +21,15 @@
     "files": ["autoload_aliases.php"],
     "exclude-from-classmap": [ "Tests/","vendor/propel/propel1/runtime/lib","vendor/propel/propel1/generator/lib" ]
   },
-  "version": "4.4",
+  "version": "1.8",
   "require": {
     "ext-simplexml": "*",
     "ext-pdo": "*",
-    "symfony/framework-bundle": "4.4.*",
+    "symfony/framework-bundle": "^3.4|4.4.*",
     "palepurple/propel1": "^1.7",
-    "symfony/console": "^4.4"
+    "symfony/console": "^3.4|4.4.*",
+    "symfony/dependency-injection": "^3.4|4.4.*",
+    "symfony/security-bundle": "^3.4|4.4.*"
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8.21|^5.0.10",

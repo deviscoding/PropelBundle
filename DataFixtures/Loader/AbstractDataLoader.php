@@ -45,7 +45,7 @@ abstract class AbstractDataLoader extends AbstractDataHandler implements DataLoa
     /**
      * {@inheritdoc}
      */
-    public function load($files = array(), $connectionName)
+    public function load($files = array(), $connectionName = null)
     {
         $nbFiles = 0;
         $this->deletedClasses = array();

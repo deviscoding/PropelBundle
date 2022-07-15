@@ -9,7 +9,6 @@
  */
 namespace Propel\Bundle\PropelBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -30,9 +29,13 @@ class PropelExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $processor = new Processor();
-        $configuration = $this->getConfiguration($configs, $container);
-        $config = $processor->processConfiguration($configuration, $configs);
+      // WORKAROUND for https://github.com/symfony/symfony/issues/27683 https://github.com/symfony/symfony/issues/40906
+      // Note that this may require the clearing of the cache after a related ENV var is changed.
+      $configs       = (new EnvResolver($container))->resolve($configs);
+      // END WORKAROUND
+      
+      $configuration = $this->getConfiguration($configs, $container);
+      $config        = $this->processConfiguration($configuration, $configs);
 
         // Composer
         if (file_exists($propelPath = $container->getParameter('kernel.root_dir') . '/../vendor/palepurple/propel1')) {
@@ -95,6 +98,11 @@ class PropelExtension extends Extension
             $this->dbalLoad($config['dbal'], $container);
         }
     }
+
+  protected function resolve(array $configs)
+  {
+
+  }
 
     /**
      * Loads the DBAL configuration.

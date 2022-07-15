@@ -150,6 +150,7 @@ class PropelDataCollector extends DataCollector
      */
     public function reset()
     {
-      // TODO: Implement reset() method.
+      $this->logger->reset();
     }
 }
+

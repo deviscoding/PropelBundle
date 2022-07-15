@@ -16,9 +16,10 @@ These conflicts are created when a dependency you have specified has `propel/pro
 
 ### Propel1 integration
 
-The one major branch being supported is:
+The two major branches being supported are:
 
-* The `1.7` branch contains Propel *1.6* integration for Symfony *3.x* and PHP *7.2+*.
+* The `1.7` branch contains Propel *1.6* integration for Symfony *3.x* and PHP *7.2+*. 
+* The `1.8` branch contains Propel *1.6* integration for Symfony *3.x* or *4.x* and PHP *7.2+*.
 
 **Note:** Only the 1.7 branch is maintained in this fork.  For newer _or_ older versions, please use the [original repo](https://github.com/propelorm/PropelBundle).
 

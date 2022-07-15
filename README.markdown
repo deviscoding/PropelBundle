@@ -21,7 +21,7 @@ The two major branches being supported are:
 * The `1.7` branch contains Propel *1.6* integration for Symfony *3.x* and PHP *7.2+*. 
 * The `1.8` branch contains Propel *1.6* integration for Symfony *3.x* or *4.x* and PHP *7.2+*.
 
-**Note:** Only the 1.7 branch is maintained in this fork.  For newer _or_ older versions, please use the [original repo](https://github.com/propelorm/PropelBundle).
+**Note:** Only the `1.7` and `1.8` branches are maintained in this fork.  For newer _or_ older versions, please use the [original repo](https://github.com/propelorm/PropelBundle).
 
 ## Features
 

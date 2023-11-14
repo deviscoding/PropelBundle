@@ -29,11 +29,6 @@ class PropelExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-      // WORKAROUND for https://github.com/symfony/symfony/issues/27683 https://github.com/symfony/symfony/issues/40906
-      // Note that this may require the clearing of the cache after a related ENV var is changed.
-      $configs       = (new EnvResolver($container))->resolve($configs);
-      // END WORKAROUND
-      
       $configuration = $this->getConfiguration($configs, $container);
       $config        = $this->processConfiguration($configuration, $configs);
 
@@ -57,13 +52,8 @@ class PropelExtension extends Extension
                 throw new \InvalidArgumentException('PropelBundle expects a "phing_path" parameter that must contain the absolute path to the Phing vendor library. The "phing_path" parameter must be defined under the "propel" root node in your configuration.');
         }
 
-        if (isset($config['logging']) && $config['logging']) {
-            $logging = $config['logging'];
-        } else {
-            $logging = false;
-        }
-
-        $container->setParameter('propel.logging', $logging);
+        // Set Logging Parameters
+        $container->setParameter('propel.logging', $config['logging'] ?? false);
 
         if (!empty($config['schema_path']))
         {
@@ -92,7 +82,12 @@ class PropelExtension extends Extension
             }
         }
 
-        $container->getDefinition('propel.build_properties')->setArguments(array($buildProperties));
+        // Store the build_properties configuration at compile time, rather than injecting into service for Properties
+        // class. This prevents issues with resolution of environment variables, which must be resolved at runtime.
+        // The synthetic service is then set in PropelBundle::boot().  See these issues for details of problem:
+        // https://github.com/symfony/symfony/issues/27683
+        // https://github.com/symfony/symfony/issues/40906
+        $container->setParameter('propel.build_properties', $buildProperties);
 
         if (!empty($config['dbal'])) {
             $this->dbalLoad($config['dbal'], $container);
@@ -143,7 +138,12 @@ class PropelExtension extends Extension
             $c['datasources']['default'] = $connectionName;
         }
 
-        $container->getDefinition('propel.configuration')->setArguments(array($c));
+        // Store the dbal configuration at compile time, rather than creating a service for the configuration object.
+        // This prevents issues with resolution of environment variables, which must be resolved at runtime.  The
+        // synthetic service is then set in PropelBundle::boot().  See these issues for details of problem:
+        // https://github.com/symfony/symfony/issues/27683
+        // https://github.com/symfony/symfony/issues/40906
+        $container->setParameter('propel.dbal', $c);
     }
 
     public function getConfiguration(array $config, ContainerBuilder $container)

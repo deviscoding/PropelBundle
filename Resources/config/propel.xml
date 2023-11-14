@@ -27,7 +27,7 @@
             <argument type="service" id="debug.stopwatch" on-invalid="null" />
         </service>
 
-        <service id="propel.data_collector" class="%propel.data_collector.class%" synthetic="true" public="false">
+        <service id="propel.data_collector" class="%propel.data_collector.class%" synthetic="true" public="true">
             <tag name="data_collector" template="@Propel/Collector/propel" id="propel" />
         </service>
 

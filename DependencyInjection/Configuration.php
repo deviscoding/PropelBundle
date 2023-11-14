@@ -12,6 +12,7 @@ namespace Propel\Bundle\PropelBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
 * This class contains the configuration information for the bundle
@@ -42,8 +43,16 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
+        if (Kernel::MAJOR_VERSION > 4 || Kernel::MAJOR_VERSION === 4 && Kernel::MINOR_VERSION >= 2)
+        {
+            $treeBuilder = new TreeBuilder('propel');
+            $rootNode = $treeBuilder->getRootNode();
+        }
+        else
+        {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('propel');
+        }
 
         $this->addGeneralSection($rootNode);
         $this->addDbalSection($rootNode);
@@ -175,8 +184,16 @@ class Configuration implements ConfigurationInterface
      */
     private function getDbalConnectionsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('connections');
+        if (Kernel::MAJOR_VERSION > 4 || Kernel::MAJOR_VERSION === 4 && Kernel::MINOR_VERSION >= 2)
+        {
+            $treeBuilder = new TreeBuilder('connections');
+            $node = $treeBuilder->getRootNode();
+        }
+        else
+        {
+            $treeBuilder = new TreeBuilder();
+            $node = $treeBuilder->root('connections');
+        };
 
         $node
             ->requiresAtLeastOneElement()

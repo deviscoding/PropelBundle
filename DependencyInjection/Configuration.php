@@ -10,8 +10,10 @@
 namespace Propel\Bundle\PropelBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
 * This class contains the configuration information for the bundle
@@ -38,12 +40,20 @@ class Configuration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
+        if (Kernel::MAJOR_VERSION > 4 || Kernel::MAJOR_VERSION === 4 && Kernel::MINOR_VERSION >= 2)
+        {
+            $treeBuilder = new TreeBuilder('propel');
+            $rootNode = $treeBuilder->getRootNode();
+        }
+        else
+        {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('propel');
+        }
 
         $this->addGeneralSection($rootNode);
         $this->addDbalSection($rootNode);
@@ -100,6 +110,8 @@ class Configuration implements ConfigurationInterface
      */
    private function addDbalSection(ArrayNodeDefinition $node)
     {
+        $dNormalizer = new DriverNormalizer();
+        $dClosure = function($v) use ($dNormalizer) { return $dNormalizer->normalize($v); };
         $node
             ->children()
             ->arrayNode('dbal')
@@ -112,7 +124,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('driver')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($dClosure)
                         ->end()
                         ->defaultValue('mysql')
                     ->end()
@@ -121,7 +133,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('dsn')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($dClosure)
                         ->end()
                         ->defaultValue('')
                     ->end()
@@ -145,14 +157,14 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->arrayNode('settings')
                     ->useAttributeAsKey('key')
-                    ->prototype('array')
+                    ->arrayPrototype()
                         ->useAttributeAsKey('key')
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()
                 ->fixXmlConfig('connection')
-                ->append($this->getDbalConnectionsNode())
+                ->append($this->getDbalConnectionsNode($dNormalizer))
             ->end()
         ;
     }
@@ -171,22 +183,32 @@ class Configuration implements ConfigurationInterface
      *         attributes:  {}
      *         settings:    {}
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return ArrayNodeDefinition|NodeDefinition The tree builder
      */
-    private function getDbalConnectionsNode()
+    private function getDbalConnectionsNode(DriverNormalizer $normalizer)
     {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('connections');
+        $closure = function($v) use ($normalizer) { return $normalizer->normalize($v); };
+
+        if (Kernel::MAJOR_VERSION > 4 || Kernel::MAJOR_VERSION === 4 && Kernel::MINOR_VERSION >= 2)
+        {
+            $treeBuilder = new TreeBuilder('connections');
+            $node = $treeBuilder->getRootNode();
+        }
+        else
+        {
+            $treeBuilder = new TreeBuilder();
+            $node = $treeBuilder->root('connections');
+        };
 
         $node
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
-            ->prototype('array')
+            ->arrayPrototype()
                 ->children()
                     ->scalarNode('driver')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($closure)
                         ->end()
                         ->defaultValue('mysql')
                     ->end()
@@ -195,19 +217,19 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('dsn')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($closure)
                         ->end()
                         ->defaultValue('')
                     ->end()
                     ->scalarNode('classname')->defaultValue($this->debug ? 'DebugPDO' : 'PropelPDO')->end()
                     ->arrayNode('slaves')
                         ->useAttributeAsKey('name')
-                        ->prototype('array')
+                        ->arrayPrototype()
                             ->children()
                                 ->scalarNode('driver')
                                     ->beforeNormalization()
                                         ->always()
-                                        ->then(function($v) { return str_replace('pdo_', '', $v); })
+                                        ->then($closure)
                                     ->end()
                                     ->defaultValue('mysql')
                                 ->end()
@@ -216,7 +238,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('dsn')
                                     ->beforeNormalization()
                                         ->always()
-                                        ->then(function($v) { return str_replace('pdo_', '', $v); })
+                                        ->then($closure)
                                     ->end()
                                     ->defaultValue('')
                                 ->end()

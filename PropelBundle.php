@@ -9,6 +9,7 @@
  */
 namespace Propel\Bundle\PropelBundle;
 
+use Propel\Bundle\PropelBundle\DependencyInjection\PropelServiceFactory;
 use Propel\Bundle\PropelBundle\DependencyInjection\Security\UserProvider\PropelFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -34,26 +35,28 @@ class PropelBundle extends Bundle
                              get_include_path());
         }
 
+        // Create the Service Factory
+        $Factory = new PropelServiceFactory();
+
+        // Set the Build Properties Service
+        $Factory->properties($this->container);
+
+        // Initialize Propel
         if (!\Propel::isInit()) {
-            \Propel::setConfiguration($this->container->get('propel.configuration'));
+            // Create Configuration object at runtime to prevent issues with environment variables
+            // used in the configuration.  If this is done at compile time, they aren't resolved.
+            // https://github.com/symfony/symfony/issues/27683
+            // https://github.com/symfony/symfony/issues/40906
+            $config = $Factory->config($this->container);
 
-            if ($this->container->getParameter('propel.logging')) {
-                $config = $this
-                    ->container
-                    ->get('propel.configuration')
-                    ;
-                $config->setParameter('debugpdo.logging.methods', array(
-                    'PropelPDO::exec',
-                    'PropelPDO::query',
-                    'PropelPDO::prepare',
-                    'DebugPDOStatement::execute',
-                ), false);
-                $config->setParameter('debugpdo.logging.details', array(
-                    'time' => array('enabled' => true),
-                    'mem' => array('enabled' => true),
-                    'connection' => array('enabled' => true),
-                ));
+            // Set the configuration created above, which has also been injected into the container as a service.
+            \Propel::setConfiguration($config);
 
+            // Initialize the propel.data_collector Service
+            $Factory->collector($this->container);
+
+            // The factory above sets the logging parameters in PropelConfiguration, if param 'propel.logging' is set.
+            if ($Factory->isPropelLogging($this->container)) {
                 \Propel::setLogger($this->container->get('propel.logger'));
             }
 

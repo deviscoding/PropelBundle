@@ -52,6 +52,9 @@ class PropelBundle extends Bundle
             // Set the configuration created above, which has also been injected into the container as a service.
             \Propel::setConfiguration($config);
 
+            // Initialize the propel.data_collector Service
+            $Factory->collector($this->container);
+
             // The factory above sets the logging parameters in PropelConfiguration, if param 'propel.logging' is set.
             if ($Factory->isPropelLogging($this->container)) {
                 \Propel::setLogger($this->container->get('propel.logger'));

@@ -110,6 +110,8 @@ class Configuration implements ConfigurationInterface
      */
    private function addDbalSection(ArrayNodeDefinition $node)
     {
+        $dNormalizer = new DriverNormalizer();
+        $dClosure = function($v) use ($dNormalizer) { return $dNormalizer->normalize($v); };
         $node
             ->children()
             ->arrayNode('dbal')
@@ -122,7 +124,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('driver')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($dClosure)
                         ->end()
                         ->defaultValue('mysql')
                     ->end()
@@ -131,7 +133,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('dsn')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($dClosure)
                         ->end()
                         ->defaultValue('')
                     ->end()
@@ -162,7 +164,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->fixXmlConfig('connection')
-                ->append($this->getDbalConnectionsNode())
+                ->append($this->getDbalConnectionsNode($dNormalizer))
             ->end()
         ;
     }
@@ -183,8 +185,10 @@ class Configuration implements ConfigurationInterface
      *
      * @return ArrayNodeDefinition|NodeDefinition The tree builder
      */
-    private function getDbalConnectionsNode()
+    private function getDbalConnectionsNode(DriverNormalizer $normalizer)
     {
+        $closure = function($v) use ($normalizer) { return $normalizer->normalize($v); };
+
         if (Kernel::MAJOR_VERSION > 4 || Kernel::MAJOR_VERSION === 4 && Kernel::MINOR_VERSION >= 2)
         {
             $treeBuilder = new TreeBuilder('connections');
@@ -204,7 +208,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('driver')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($closure)
                         ->end()
                         ->defaultValue('mysql')
                     ->end()
@@ -213,7 +217,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('dsn')
                         ->beforeNormalization()
                             ->always()
-                            ->then(function($v) { return str_replace('pdo_', '', $v); })
+                            ->then($closure)
                         ->end()
                         ->defaultValue('')
                     ->end()
@@ -225,7 +229,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('driver')
                                     ->beforeNormalization()
                                         ->always()
-                                        ->then(function($v) { return str_replace('pdo_', '', $v); })
+                                        ->then($closure)
                                     ->end()
                                     ->defaultValue('mysql')
                                 ->end()
@@ -234,7 +238,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('dsn')
                                     ->beforeNormalization()
                                         ->always()
-                                        ->then(function($v) { return str_replace('pdo_', '', $v); })
+                                        ->then($closure)
                                     ->end()
                                     ->defaultValue('')
                                 ->end()
